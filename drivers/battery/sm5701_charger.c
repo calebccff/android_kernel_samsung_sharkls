@@ -89,7 +89,7 @@ static int SM5701_get_battery_present(struct SM5701_charger_data *charger)
 
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_STATUS1, &data);
 
-	pr_info("%s: SM5701_STATUS1 (0x%02x)\n", __func__, data);
+	//pr_info("%s: SM5701_STATUS1 (0x%02x)\n", __func__, data);
 
 	data = ((data & SM5701_STATUS1_NOBAT) >> SM5701_STATUS1_NOBAT_SHIFT);
 
@@ -113,7 +113,7 @@ static int SM5701_get_charging_status(struct SM5701_charger_data *charger)
 	int full_check_type;
 
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_STATUS2, &stat2);
-	pr_info("%s : SM5701_STATUS2 : 0x%02x\n", __func__, stat2);
+	//pr_info("%s : SM5701_STATUS2 : 0x%02x\n", __func__, stat2);
 
 //	Clear interrupt register 2
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_INT2, &cln);
@@ -217,8 +217,8 @@ static int SM5701_get_charging_health(struct SM5701_charger_data *charger)
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_INT2, &cln_int2);
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_INT1, &cln_int1);
 
-	pr_info("%s : Health, SM5701_STATUS1 : 0x%02x, SM5701_STATUS2 : 0x%02x\n", __func__, stat1, stat2);
-	pr_info("%s : Health, SM5701_INT1 : 0x%02x, SM5701_INT2 : 0x%02x\n", __func__, cln_int1, cln_int2);
+	//pr_info("%s : Health, SM5701_STATUS1 : 0x%02x, SM5701_STATUS2 : 0x%02x\n", __func__, stat1, stat2);
+	//pr_info("%s : Health, SM5701_INT1 : 0x%02x, SM5701_INT2 : 0x%02x\n", __func__, cln_int1, cln_int2);
 
 	mask = charger->dev_id < 3 ? OP_MODE_CHG_ON : OP_MODE_CHG_ON_REV3;
 	chg_en &= ~mask;
@@ -233,7 +233,7 @@ static int SM5701_get_charging_health(struct SM5701_charger_data *charger)
 
 #if defined(CONFIG_MACH_J3XLTE) || defined(CONFIG_MACH_J3XNLTE)
 	if ((stat1 & SM5701_STATUS1_AICL) || (cln_int1 & SM5701_INT1_AICL)) {
-		pr_info("%s: SM5701 HW AICL irq!! \n", __func__);
+		//pr_info("%s: SM5701 HW AICL irq!! \n", __func__);
 	}
 #endif
 #if defined(CONFIG_MACH_J1POP3G) || defined(CONFIG_BATTERY_JXX_LTE)
@@ -305,7 +305,7 @@ static u8 sm5701_get_float_voltage(struct SM5701_charger_data *charger)
 
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_CHGCNTL3, &data);
 	data &= 0x1F;
-	pr_info("%s: battery cv voltage 0x%x\n", __func__, data);
+	//pr_info("%s: battery cv voltage 0x%x\n", __func__, data);
 
 	return data;
 }
@@ -669,7 +669,7 @@ static void SM5701_charger_initialize(struct SM5701_charger_data *charger)
 	SM5701_reg_write(charger->SM5701->i2c, SM5701_VBUSCNTL, reg_data);
 
 	SM5701_reg_read(charger->SM5701->i2c, SM5701_STATUS1, &status1);
-	pr_info("%s : SM5701_STATUS1 : 0x%02x\n", __func__, status1);
+	//pr_info("%s : SM5701_STATUS1 : 0x%02x\n", __func__, status1);
 
 #if defined(CONFIG_MACH_J3XLTE) || defined(CONFIG_MACH_J3XNLTE)
 /* NOBAT, Enable OVP, UVLO, VBUSOK, AICL interrupts */
