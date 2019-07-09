@@ -31,17 +31,21 @@
 #include <asm/byteorder.h>
 #include <linux/platform_device.h>
 #include <linux/suspend.h>
+
 #ifdef CONFIG_SPRDWL_ENHANCED_PM
 #include <linux/earlysuspend.h>
 #endif
+
 #ifdef CONFIG_OF
 #include <linux/of.h>
 #include <linux/of_device.h>
 #endif
+
 #include <linux/sipc.h>
 #include <linux/atomic.h>
 
-#include <linux/sprd_2351.h>
+
+
 #ifdef CONFIG_SPRDWL_POWER_CONTROL
 #include <linux/kobject.h>
 #include <linux/sysfs.h>
@@ -49,6 +53,7 @@
 #endif
 
 #include "sprdwl.h"
+#include <linux/sprd_2351.h>
 #include "cfg80211.h"
 #include "sipc.h"
 #include "npi.h"

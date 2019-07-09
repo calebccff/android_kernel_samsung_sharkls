@@ -272,10 +272,10 @@ STATIC_FUNC void _sendCmd(struct sdhost_host *host, struct mmc_command *cmd)
 	int ifDma = 0;
 	uint16_t autoCmd = __ACMD_DIS;
 
-//      printk("sdhost %s cmd %d, arg 0x%x, flag 0x%x\n", host->deviceName, cmd->opcode, cmd->arg, cmd->flags);
-//      if (cmd->data) {
-//              printk("sdhost %s blkSize %d, cnt %d\n", host->deviceName, cmd->data->blksz, cmd->data->blocks);
-//      }
+     printk("sdhost %s cmd %d, arg 0x%x, flag 0x%x\n", host->deviceName, cmd->opcode, cmd->arg, cmd->flags);
+     if (cmd->data) {
+             printk("sdhost %s blkSize %d, cnt %d\n", host->deviceName, cmd->data->blksz, cmd->data->blocks);
+     }
 	_sdhost_disableall_int(host->ioaddr);
 
 	if (38 == cmd->opcode) {
@@ -392,7 +392,7 @@ STATIC_FUNC irqreturn_t _irq(int irq, void *param)
 		spin_unlock(&host->lock);
 		return IRQ_NONE;
 	}
-//      printk("sdhost %s int 0x%x\n", host->deviceName, intmask);
+    printk("sdhost %s int 0x%x\n", host->deviceName, intmask);
 
 	// disable unused interrupt
 	_sdhost_clear_int(host->ioaddr, intmask);
@@ -404,8 +404,9 @@ STATIC_FUNC irqreturn_t _irq(int irq, void *param)
 			if (_INT_FILTER_ERR_CMD & intmask) {
 				if (_INT_ERR_CMD_TIMEOUT & intmask) {
 					// Skip print dump when triggered wifi
-					if (strcmp("sdio_wifi", host->deviceName) == 0)
-						skip_dump = 1;
+					// if (strcmp("sdio_wifi", host->deviceName) == 0)
+					// 	skip_dump = 1;
+					/// Actually don't skip dump, I have no clue what this is...
 					cmd->error = -ETIMEDOUT;
 				} else {
 					cmd->error = -EILSEQ;
@@ -636,7 +637,7 @@ STATIC_FUNC int sdhost_set_vqmmc(struct mmc_host *mmc, struct mmc_ios *ios)
 	struct sdhost_host *host = mmc_priv(mmc);
 	unsigned long flags;
 	int err;
-/*
+
 	printk("sdhost %s vqmmc:\n"
 	       "sdhost clock = %d-->%d\n"
 	       "sdhost vdd = %d-->%d\n"
@@ -655,7 +656,7 @@ STATIC_FUNC int sdhost_set_vqmmc(struct mmc_host *mmc, struct mmc_ios *ios)
 	       host->ios.power_mode, ios->power_mode,
 	       host->ios.bus_width, ios->bus_width,
 	       host->ios.timing, ios->timing, host->ios.signal_voltage, ios->signal_voltage, host->ios.drv_type, ios->drv_type);
-*/
+
 	_runtime_get(host);
 	spin_lock_irqsave(&host->lock, flags);
 
@@ -701,7 +702,7 @@ STATIC_FUNC void sdhost_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 {
 	struct sdhost_host *host = mmc_priv(mmc);
 	unsigned long flags;
-/*
+
 	printk("sdhost %s ios:\n"
 	       "sdhost clock = %d-->%d\n"
 	       "sdhost vdd = %d-->%d\n"
@@ -720,7 +721,7 @@ STATIC_FUNC void sdhost_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	       host->ios.power_mode, ios->power_mode,
 	       host->ios.bus_width, ios->bus_width,
 	       host->ios.timing, ios->timing, host->ios.signal_voltage, ios->signal_voltage, host->ios.drv_type, ios->drv_type);
-*/
+
 	_runtime_get(host);
 	spin_lock_irqsave(&host->lock, flags);
 

@@ -24,6 +24,10 @@
 
 #endif
 
+//Extra debugging
+#define KERNEL_DEBUG_LEVE     "\001" "0"
+#define printke(fmt, ...)     ({printk(KERNEL_DEBUG_LEVE "[SC2331]" fmt, ##__VA_ARGS__); 0; })
+
 static struct mutex    g_sdio_func_lock;
 static int             ack_gpio_status = 0;
 
@@ -258,12 +262,15 @@ int fwdownload_fin = 0;
 
 int get_sprd_download_fin(void)
 {
+	printke("[KL6969] %s called! Return: %d", __func__, fwdownload_fin);
 	return fwdownload_fin;
 }
 EXPORT_SYMBOL_GPL(get_sprd_download_fin);
 
 void set_sprd_download_fin(int dl_tag)
 {
+	printke("[KL6969] set_sprd_download_fin() is called so marlin_sdio_ready.marlin_sdio_init_end_tag is 1!");
+
 	marlin_sdio_ready.marlin_sdio_init_end_tag = 1;
 	return fwdownload_fin = dl_tag;
 }
@@ -273,8 +280,8 @@ unsigned int irq_count_change = 0;
 unsigned int irq_count_change_last = 0;
 bool get_sprd_marlin_status(void)
 {
-	printk(KERN_INFO "irq_count_change:%d\n",irq_count_change);
-	printk(KERN_INFO "irq_count_change_last:%d\n",irq_count_change_last);
+	printke("irq_count_change:%d\n",irq_count_change);
+	printke("irq_count_change_last:%d\n",irq_count_change_last);
 
 	if((irq_count_change == 0)&&(irq_count_change_last == 0))
 		return 1;
@@ -1187,12 +1194,14 @@ EXPORT_SYMBOL_GPL(get_apsdiohal_status);
 //return 1 means marlin sdiohal ready
 bool get_sdiohal_status(void)
 {
+	printke("[KL6969] get_sdiohal_status() called, marlin_sdio_ready.marlin_sdio_init_end_tag is %d",marlin_sdio_ready.marlin_sdio_init_end_tag);
 	return marlin_sdio_ready.marlin_sdio_init_end_tag;
 }
 EXPORT_SYMBOL_GPL(get_sdiohal_status);
 
 static void clear_sdiohal_status(void)
 {
+	printke("[KL6969] clear_sdiohal_status() called, marlin_sdio_ready.marlin_sdio_init_end_tag is %d",marlin_sdio_ready.marlin_sdio_init_end_tag);
 	marlin_sdio_ready.marlin_sdio_init_start_tag = 0;
 	marlin_sdio_ready.marlin_sdio_init_end_tag = 0;
 }
@@ -1203,6 +1212,8 @@ static irqreturn_t marlinsdio_ready_irq_handler(int irq, void * para)
 
 	
 	SDIOTRAN_ERR("entry");
+
+	printke("[KL6969] marlinsdio_ready_irq_handler() called with %d",irq);
 	
 	if(!marlin_sdio_ready.marlin_sdio_init_start_tag){
 		SDIOTRAN_ERR("start");
@@ -1211,6 +1222,7 @@ static irqreturn_t marlinsdio_ready_irq_handler(int irq, void * para)
 	else{
 		SDIOTRAN_ERR("end");
 		irq_set_irq_type(irq,IRQF_TRIGGER_HIGH);
+		
 		marlin_sdio_ready.marlin_sdio_init_end_tag = 1;}
 	
 	if(!marlin_sdio_ready.marlin_sdio_init_end_tag)
@@ -1296,17 +1308,22 @@ static irqreturn_t marlinwake_irq_handler(int irq, void * para)
 	//irq_set_irq_type(irq,IRQF_TRIGGER_RISING|IRQF_TRIGGER_FALLING);
 	gpio_wake_status = gpio_get_value(sdio_data->wake_ack);
 
+	printke("%s called, might set marlin_sdio_init_end_tag = 1;", __func__);
+
 	if(get_sprd_download_fin() != 1)
 	{
+		printke("get_sprd_download_fin() didn't return -1");
 		if(!marlin_sdio_ready.marlin_sdio_init_start_tag && gpio_wake_status){
 			SDIOTRAN_ERR("start,g_val=%d",gpio_wake_status);
 			irq_set_irq_type(irq,IRQF_TRIGGER_LOW);
 			marlin_sdio_ready.marlin_sdio_init_start_tag = 1;
+			printke("marlin_sdio_init_start_tag = 1; must start before we end");
 		}
 		else if(!marlin_sdio_ready.marlin_sdio_init_end_tag && (!gpio_wake_status)){
 			SDIOTRAN_ERR("end,g_val=%d",gpio_wake_status);
 			irq_set_irq_type(irq,IRQF_TRIGGER_RISING);
 			marlin_sdio_ready.marlin_sdio_init_end_tag = 1;
+			printke("%s: Finally, marlin_sdio_init_end_tag = 1;", __func__);
 		}
 		else
 		{
@@ -1544,6 +1561,8 @@ static void sdio_uninit_timer(void)
 
 static int marlin_sdio_probe(struct sdio_func *func, const struct sdio_device_id *id)
 {
+
+	printke("[KL6969] %s called with func device %x and sdio_device %x ", __func__, func->device, id->device);
 	int ret;
 	
 	SDIOTRAN_ERR("sdio drv and dev match!!!");
@@ -1693,10 +1712,12 @@ void  marlin_sdio_uninit(void)
 
 int marlin_sdio_init(void)
 {
+	printke("[KL6969] marlin_sdio_init(void) was called");
 	int ret;
 	struct device_node *np;
 	SDIOTRAN_ERR("entry");
 	if(have_card == 1){
+		printke("[KL6969] have_card is 1!");
 		marlin_sdio_uninit();
 	}
 	mgr_suspend_init();
